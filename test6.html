@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed Details - Review & Confirm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Consistent with your previous pages */
+        .animation-fade-in {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-8 font-sans text-sm text-gray-700">
+
+    <div class="max-w-6xl mx-auto bg-white shadow-sm border border-gray-200 p-6 relative">
+        <h1 class="text-2xl font-semibold mb-8">Review</h1>
+
+        <div class="relative flex items-center justify-between mb-12">
+            <div class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -z-10"></div>
+            <script>
+                const steps = ["Data", "Exclusions", "Transformations", "Enrichments", "Review & Confirm"];
+                steps.forEach((name, i) => {
+                    const isActive = name === "Review & Confirm";
+                    const isCompleted = i < 4;
+                    document.write(`
+                        <div class="flex flex-col items-center">
+                            <div class="w-${isActive ? '4' : '3'} h-${isActive ? '4' : '3'} 
+                                ${isActive ? 'bg-yellow-400 ring-2 ring-yellow-400' : isCompleted ? 'bg-green-500' : 'bg-gray-200'} 
+                                rounded-full border-2 border-white mb-2"></div>
+                            <span class="text-[10px] uppercase font-bold ${isActive ? 'text-gray-800' : 'text-gray-300'}">${name}</span>
+                        </div>
+                    `);
+                });
+            </script>
+        </div>
+
+        <div class="space-y-8 animation-fade-in">
+            
+            <div class="grid grid-cols-2 gap-6">
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-3 border-b border-gray-200 pb-2">
+                        <span class="font-bold uppercase text-[10px] text-gray-500 tracking-wider">01. Data Source</span>
+                        <a href="#" class="text-blue-600 text-[10px] font-bold hover:underline uppercase">Edit</a>
+                    </div>
+                    <p class="text-xs"><strong>Source:</strong> Google_Merchant_Master.csv</p>
+                    <p class="text-xs text-gray-500 mt-1">12,402 products detected. 8 core columns mapped.</p>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-3 border-b border-gray-200 pb-2">
+                        <span class="font-bold uppercase text-[10px] text-gray-500 tracking-wider">02. Exclusions</span>
+                        <a href="#" class="text-blue-600 text-[10px] font-bold hover:underline uppercase">Edit</a>
+                    </div>
+                    <ul class="text-xs space-y-1">
+                        <li>• <span class="text-red-600 font-medium">Best Sellers Only:</span> Enabled</li>
+                        <li>• <span class="text-red-600 font-medium">Logic:</span> Price > 0 AND Stock > 5</li>
+                    </ul>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-3 border-b border-gray-200 pb-2">
+                        <span class="font-bold uppercase text-[10px] text-gray-500 tracking-wider">03. Transformations</span>
+                        <a href="#" class="text-blue-600 text-[10px] font-bold hover:underline uppercase">Edit</a>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="text-[10px] bg-white border border-gray-200 p-2 rounded">
+                            <span class="text-blue-600 font-bold">IF</span> price > 100 <span class="text-green-600 font-bold">THEN</span> shipping = 0
+                        </div>
+                        <div class="text-[10px] bg-white border border-gray-200 p-2 rounded">
+                            <span class="text-blue-600 font-bold">IF</span> desc empty <span class="text-green-600 font-bold">THEN</span> desc = title
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-3 border-b border-gray-200 pb-2">
+                        <span class="font-bold uppercase text-[10px] text-gray-500 tracking-wider">04. Enrichments</span>
+                        <a href="#" class="text-blue-600 text-[10px] font-bold hover:underline uppercase">Edit</a>
+                    </div>
+                    <p class="text-xs italic text-gray-500">Left join configured using <strong>SKU</strong> as the primary key against <span class="text-gray-700 font-medium">supplier_costs.xlsx</span>.</p>
+                </div>
+
+            </div>
+
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded shadow-sm">
+                <div class="flex items-center gap-3">
+                    <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                    <p class="text-xs text-blue-700">
+                        This configuration will create a new automated feed. All rules will be applied every 24 hours during the scheduled refresh.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex justify-center gap-2 pt-6">
+                <a href="file:///Users/wasif.butt38/Downloads/test5.html" 
+                    class="inline-block bg-red-600 text-white px-4 py-1.5 rounded hover:bg-red-700 text-sm text-center">
+                    Back
+                </a>             
+                <a href="file:///Users/wasif.butt38/Downloads/test.html" 
+                    class="inline-block bg-green-600 text-white px-4 py-1.5 rounded hover:bg-green-700 text-sm text-center">
+                    Submit
+                </a>                
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag & Drop Template Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Styles for the dragging state */
+        .dragging {
+            opacity: 0.5;
+            border: 2px dashed #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-8 font-sans text-sm text-gray-700">
+
+    <div class="max-w-6xl mx-auto bg-white shadow-sm border border-gray-200 p-6">
+        <h1 class="text-2xl font-semibold mb-8">Data</h1>
+
+        <div class="relative flex items-center justify-between mb-12">
+            <div class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -z-10"></div>
+            
+            <div class="flex flex-col items-center">
+                <div class="w-3 h-3 bg-gray-200 rounded-full border-2 border-white mb-2"></div>
+                <span class="text-[10px] uppercase font-bold text-gray-400">Feed Details</span>
+            </div>
+
+            <div class="flex flex-col items-center">
+                <div class="w-4 h-4 bg-yellow-400 rounded-full border-2 border-white ring-2 ring-yellow-400 mb-2"></div>
+                <span class="text-[10px] uppercase font-bold text-gray-400">Data</span>
+            </div>
+
+            <script>
+                const steps = ["Exclusions", "Transformations", "Enrichments", "Review & Confirm"];
+                steps.forEach((name, i) => {
+                    document.write(`
+                        <div class="flex flex-col items-center">
+                            <div class="w-3 h-3 bg-gray-200 rounded-full border-2 border-white mb-2"></div>
+                            <span class="text-[10px] text-gray-300">${name}</span>
+                        </div>
+                    `);
+                });
+            </script>
+        </div>
+
+        <div id="column-list" class="space-y-2 mb-6">
+            </div>
+
+        <button onclick="addColumn()" class="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 w-full justify-center rounded-md text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-all font-bold">
+            + Add New Column
+        </button>
+
+        <div class="flex justify-center gap-2 pt-6">
+            <a href="file:///Users/wasif.butt38/Downloads/test.html" 
+                class="inline-block bg-red-600 text-white px-4 py-1.5 rounded hover:bg-red-700 text-sm text-center">
+                Back
+            </a>             
+            <a href="file:///Users/wasif.butt38/Downloads/test3.html" 
+                class="inline-block bg-green-600 text-white px-4 py-1.5 rounded hover:bg-green-700 text-sm text-center">
+                Next
+            </a>                
+        </div>
+    </div>
+
+    <datalist id="header-options">
+        <option value="product_id">
+        <option value="product_name">
+        <option value="shipping">
+        <option value="price">
+    </datalist>
+
+    <script>
+        const container = document.getElementById('column-list');
+
+        function addColumn() {
+            const row = document.createElement('div');
+            row.className = "flex items-center gap-4 bg-white p-3 border border-gray-200 rounded-md shadow-sm cursor-default";
+            row.draggable = true; // Enable HTML5 Drag
+            
+            row.innerHTML = `
+                <div class="drag-handle cursor-grab text-gray-300 hover:text-gray-600 px-1 select-none">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+                </div>
+
+                <div class="w-1/3">
+                    <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Source Element</label>
+                    <select class="w-full border border-gray-300 p-2 rounded bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                        <option value="product_id">product_id</option>
+                        <option value="product_name">product_name</option>
+                        <option value="shipping">shipping</option>
+                    </select>
+                </div>
+
+                <div class="flex-1">
+                    <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Rename Alias (Header Name)</label>
+                    <div class="flex items-center gap-3">
+                        <input type="text" placeholder="e.g. Product ID" 
+                            class="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-100 outline-none">
+                    </div>
+                </div>
+
+                <button onclick="this.parentElement.remove()" class="mt-4 text-gray-300 hover:text-red-500 transition-colors p-2" title="Delete Column">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            `;
+
+            // Drag Events
+            row.addEventListener('dragstart', () => row.classList.add('dragging'));
+            row.addEventListener('dragend', () => row.classList.remove('dragging'));
+
+            container.appendChild(row);
+        }
+
+        // Handle the sorting logic
+        container.addEventListener('dragover', e => {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(container, e.clientY);
+            const dragging = document.querySelector('.dragging');
+            if (afterElement == null) {
+                container.appendChild(dragging);
+            } else {
+                container.insertBefore(dragging, afterElement);
+            }
+        });
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('[draggable="true"]:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        // Initialize
+        addColumn();
+    </script>
+</body>
+</html>

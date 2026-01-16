@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed Details - Enrichments</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 p-8 font-sans text-sm text-gray-700">
+
+    <div class="max-w-6xl mx-auto bg-white shadow-sm border border-gray-200 p-6">
+        <h1 class="text-2xl font-semibold mb-8">Enrichments</h1>
+
+        <div class="relative flex items-center justify-between mb-12">
+            <div class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -z-10"></div>
+            <script>
+                const steps = ["Feed Details", "Data", "Exclusions", "Transformations", "Enrichments", "Review & Confirm"];
+                steps.forEach((name, i) => {
+                    const isActive = name === "Enrichments";
+                    const isCompleted = i < 3;
+                    document.write(`
+                        <div class="flex flex-col items-center">
+                            <div class="w-${isActive ? '4' : '3'} h-${isActive ? '4' : '3'} 
+                                ${isActive ? 'bg-yellow-400 ring-2 ring-yellow-400' : 'bg-gray-200'} 
+                                rounded-full border-2 border-white mb-2 transition-all"></div>
+                            <span class="text-[10px] uppercase font-bold ${isActive ? 'text-gray-800' : 'text-gray-300'}">${name}</span>
+                        </div>
+                    `);
+                });
+            </script>
+        </div>
+
+        <form class="space-y-8">
+            
+            <div class="grid grid-cols-4 gap-4 items-start">
+                <div class="text-right pr-4">
+                    <label class="font-bold block">External Data Source</label>
+                    <p class="text-[10px] text-gray-400 italic mt-1">Upload the CSV/Excel file you wish to LEFT JOIN with your primary feed.</p>
+                </div>
+                
+                <div class="col-span-3">
+                    <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all">
+                        <div class="flex items-center gap-4">
+                            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                            <p class="text-sm text-gray-500 font-semibold">Upload Enrichment Data</p>
+                        </div>
+                        <input type="file" class="hidden" />
+                    </label>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-4 gap-4 items-start pt-6 border-t border-gray-100">
+                <div class="text-right pr-4">
+                    <label class="font-bold block">Join Configuration</label>
+                    <p class="text-[10px] text-gray-400 italic mt-1">Define the Primary and Foreign keys used to map rows correctly.</p>
+                </div>
+                
+                <div class="col-span-3">
+                    <div id="join-container" class="space-y-4">
+                        <div class="join-row bg-white border border-gray-300 rounded-lg p-6 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-1 rounded">Left Join Logic</span>
+                                <button type="button" onclick="this.closest('.join-row').remove()" class="text-gray-300 hover:text-red-500 transition-colors">
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                </button>
+                            </div>
+
+                            <div class="flex items-center gap-4">
+                                <div class="flex-1">
+                                    <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Local Feed Key</label>
+                                    <select class="w-full border border-gray-300 p-2 rounded text-xs bg-gray-50 outline-none focus:ring-1 focus:ring-blue-500">
+                                        <option value="product_id">product_id (Primary Key)</option>
+                                        <option value="sku">sku</option>
+                                        <option value="ean">ean</option>
+                                    </select>
+                                </div>
+
+                                <div class="pt-5 text-gray-400 font-mono font-bold text-lg">
+                                    ==
+                                </div>
+
+                                <div class="flex-1">
+                                    <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">External Source Key</label>
+                                    <input type="text" placeholder="e.g. source_id" 
+                                        class="w-full border border-gray-300 p-2 rounded text-xs outline-none focus:ring-1 focus:ring-blue-500">
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 p-3 bg-gray-50 rounded text-[11px] text-gray-500 leading-relaxed border-l-4 border-blue-400">
+                                <strong>Execution:</strong> The system will scan the uploaded file for rows where <strong>External Source Key</strong> matches the <strong>Local Feed Key</strong>. When a match is found, all additional columns from the uploaded file will be appended to the corresponding product row in the feed.
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="addJoin()" class="mt-4 text-blue-600 hover:underline font-bold text-xs">
+                        + Add Additional Join Condition
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex justify-center gap-2 pt-6">
+                <a href="file:///Users/wasif.butt38/Downloads/test4.html" 
+                    class="inline-block bg-red-600 text-white px-4 py-1.5 rounded hover:bg-red-700 text-sm text-center">
+                    Back
+                </a>             
+                <a href="file:///Users/wasif.butt38/Downloads/test6.html" 
+                    class="inline-block bg-green-600 text-white px-4 py-1.5 rounded hover:bg-green-700 text-sm text-center">
+                    Next
+                </a>                
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function addJoin() {
+            const container = document.getElementById('join-container');
+            const newRow = container.firstElementChild.cloneNode(true);
+            newRow.querySelector('input').value = '';
+            container.appendChild(newRow);
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exclusions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar for multi-select */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        
+        /* Fade in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animation-fade-in {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-8 font-sans text-sm text-gray-700">
+
+    <div class="max-w-6xl mx-auto bg-white shadow-sm border border-gray-200 p-6 relative">
+        <h1 class="text-2xl font-semibold mb-8">Exclusions</h1>
+
+        <div class="relative flex items-center justify-between mb-12">
+            <div class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -z-10"></div>
+            
+            <div class="flex flex-col items-center">
+                <div class="w-3 h-3 bg-gray-200 rounded-full border-2 border-white mb-2"></div>
+                <span class="text-[10px] text-gray-300">Feed Details</span>
+            </div>
+
+            <script>
+                const steps = ["Data", "Exclusions", "Transformations", "Enrichments", "Review & Confirm"];
+                steps.forEach((name, i) => {
+                    const isActive = name === "Exclusions";
+                    document.write(`
+                        <div class="flex flex-col items-center">
+                            <div class="w-${isActive ? '4' : '3'} h-${isActive ? '4' : '3'} ${isActive ? 'bg-yellow-400 ring-2 ring-yellow-400' : 'bg-gray-200'} rounded-full border-2 border-white mb-2"></div>
+                            <span class="text-[10px] uppercase font-bold ${isActive ? 'text-gray-600' : 'text-gray-300'}">${name}</span>
+                        </div>
+                    `);
+                });
+            </script>
+        </div>
+
+        <form class="space-y-6">
+            
+            <div class="grid grid-cols-4 gap-4 items-start">
+                <label class="text-right font-bold pr-4 pt-1">Best Sellers Only</label>
+                <div class="col-span-3 flex items-center gap-3">
+                    <input type="checkbox" id="best_seller" class="w-4 h-4 accent-blue-600">
+                    <label for="best_seller" class="text-gray-600 italic text-xs">Tick this box if this feed is to include ONLY bestselling products.</label>
+                </div>
+            </div>
+
+            <hr class="border-gray-100">
+
+            <div class="grid grid-cols-4 gap-4 items-start">
+                <label class="text-right font-bold pr-4 pt-1">Product Selection</label>
+                <div class="col-span-3">
+                    <div class="flex items-center gap-3 mb-4">
+                        <input type="checkbox" id="all_products" checked onchange="toggleProductList()" class="w-4 h-4 accent-blue-600">
+                        <label for="all_products" class="font-medium">Include all product types</label>
+                    </div>
+
+                    <div id="product_type_container" class="hidden border border-gray-200 rounded-md p-4 bg-gray-50 max-w-md">
+                        <label class="block text-[10px] uppercase font-bold text-gray-400 mb-2">Select Specific Product Types</label>
+                        <div class="h-40 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                            <label class="flex items-center gap-2 bg-white p-2 border border-gray-100 rounded">
+                                <input type="checkbox" value="clothing"> Clothing
+                            </label>
+                            <label class="flex items-center gap-2 bg-white p-2 border border-gray-100 rounded">
+                                <input type="checkbox" value="electronics"> Electronics
+                            </label>
+                            <label class="flex items-center gap-2 bg-white p-2 border border-gray-100 rounded">
+                                <input type="checkbox" value="home_garden"> Home & Garden
+                            </label>
+                            <label class="flex items-center gap-2 bg-white p-2 border border-gray-100 rounded">
+                                <input type="checkbox" value="beauty"> Beauty & Health
+                            </label>
+                            <label class="flex items-center gap-2 bg-white p-2 border border-gray-100 rounded">
+                                <input type="checkbox" value="toys"> Toys & Games
+                            </label>
+                        </div>
+                        <p class="text-[10px] text-gray-400 mt-2">Only selected types will be included in the feed.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-4 gap-4 items-start pt-6 border-t border-gray-100">
+                <label class="text-right font-bold pr-4 pt-1">Only include data where:</label>
+                
+                <div class="col-span-3">
+                    <div class="flex items-center gap-6 mb-4 bg-blue-50 p-3 rounded-md border border-blue-100 w-fit">
+                        <span class="text-xs font-bold text-blue-800 uppercase tracking-wider">Logic:</span>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="logic_gate" value="all" checked class="accent-blue-600">
+                            <span class="text-sm">All conditions met (AND)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="logic_gate" value="any" class="accent-blue-600">
+                            <span class="text-sm">Any condition met (OR)</span>
+                        </label>
+                    </div>
+
+                    <div id="conditions-container" class="space-y-3">
+                        </div>
+
+                    <div class="flex items-center gap-4 mt-5">
+                        <button type="button" onclick="addCondition()" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-bold transition-colors">
+                            <span class="text-lg">+</span> Add Condition
+                        </button>
+
+                        <span class="text-gray-300">|</span>
+
+                        <button type="button" onclick="openCopyModal()" class="flex items-center gap-2 text-purple-600 hover:text-purple-800 font-bold transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                            Copy Rules From Another Feed
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-center gap-2 pt-12">
+                <a href="file:///Users/wasif.butt38/Downloads/test2.html" 
+                    class="inline-block bg-red-600 text-white px-4 py-1.5 rounded hover:bg-red-700 text-sm text-center">
+                    Back
+                </a>             
+                <a href="file:///Users/wasif.butt38/Downloads/test4.html" 
+                    class="inline-block bg-green-600 text-white px-4 py-1.5 rounded hover:bg-green-700 text-sm text-center">
+                    Next
+                </a>                
+            </div>
+
+        </form>
+    </div>
+
+    <div id="copyModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 hidden items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-lg shadow-xl w-96 p-6 transform transition-all scale-100">
+            <h2 class="text-lg font-bold text-gray-800 mb-4">Copy Rules</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Select Source Feed</label>
+                    <select id="sourceFeedSelect" class="w-full border border-gray-300 p-2 rounded text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-purple-200">
+                        <option value="">-- Choose a feed --</option>
+                        <option value="google_shopping">Google Shopping Main (UK)</option>
+                        <option value="fb_retargeting">Facebook Retargeting Q4</option>
+                        <option value="affiliate_window">Affiliate Window Winter Sale</option>
+                        <option value="tiktok_ads">TikTok Ads (Best Sellers)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Merge Strategy</label>
+                    <select id="mergeStrategy" class="w-full border border-gray-300 p-2 rounded text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-purple-200">
+                        <option value="overwrite">Overwrite all current rules</option>
+                        <option value="append">Add to current rules</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 mt-6">
+                <button type="button" onclick="closeCopyModal()" class="px-4 py-2 text-gray-500 hover:text-gray-700 font-medium text-sm">Cancel</button>
+                <button type="button" onclick="executeCopy()" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 font-bold text-sm">Copy Rules</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Data & Helpers ---
+        const dataFields = ["product_id", "product_name", "shipping", "price", "stock_level", "description"];
+        const operators = [
+            { val: "eq", label: "is equal to" },
+            { val: "neq", label: "is not equal to" },
+            { val: "cont", label: "contains" },
+            { val: "ncont", label: "does not contain" },
+            { val: "gt", label: "is greater than" },
+            { val: "lt", label: "is less than" }
+        ];
+
+        // --- Core Functions ---
+        
+        function addCondition(field = "", operator = "eq", value = "") {
+            const container = document.getElementById('conditions-container');
+            const row = document.createElement('div');
+            row.className = "flex items-center gap-2 group animation-fade-in";
+
+            row.innerHTML = `
+                <select class="flex-1 border border-gray-300 p-2 rounded bg-white focus:ring-1 focus:ring-blue-500 outline-none">
+                    ${dataFields.map(f => `<option value="${f}" ${f === field ? 'selected' : ''}>${f}</option>`).join('')}
+                </select>
+
+                <select class="w-40 border border-gray-300 p-2 rounded bg-gray-50 focus:ring-1 focus:ring-blue-500 outline-none font-medium">
+                    ${operators.map(op => `<option value="${op.val}" ${op.val === operator ? 'selected' : ''}>${op.label}</option>`).join('')}
+                </select>
+
+                <input type="text" placeholder="Value..." value="${value}"
+                    class="flex-1 border border-gray-300 p-2 rounded focus:ring-1 focus:ring-blue-500 outline-none">
+
+                <button type="button" onclick="this.parentElement.remove()" class="p-2 text-gray-300 hover:text-red-500 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            `;
+            container.appendChild(row);
+        }
+
+        function toggleProductList() {
+            const isAllSelected = document.getElementById('all_products').checked;
+            const container = document.getElementById('product_type_container');
+            if (isAllSelected) {
+                container.classList.add('hidden');
+            } else {
+                container.classList.remove('hidden');
+            }
+        }
+
+        // --- Modal Logic ---
+
+        function openCopyModal() {
+            const modal = document.getElementById('copyModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeCopyModal() {
+            const modal = document.getElementById('copyModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function executeCopy() {
+            const strategy = document.getElementById('mergeStrategy').value;
+            const feed = document.getElementById('sourceFeedSelect').value;
+            const container = document.getElementById('conditions-container');
+
+            if(!feed) {
+                alert("Please select a feed.");
+                return;
+            }
+
+            if (strategy === 'overwrite') {
+                container.innerHTML = ''; // clear existing
+            }
+
+            // Simulate fetching data from the selected feed
+            // In a real app, this would come from an API
+            addCondition('price', 'gt', '50');
+            addCondition('stock_level', 'lt', '5');
+            addCondition('shipping', 'eq', '0');
+
+            closeCopyModal();
+        }
+
+        // --- Initialization ---
+        window.onload = () => {
+            toggleProductList();
+        };
+    </script>
+
+</body>
+</html>
